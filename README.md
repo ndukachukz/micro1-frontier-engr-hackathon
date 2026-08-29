@@ -101,15 +101,17 @@ under `docs/eval-evidence/trajectories/<agent>/<case>.md`:
 | agent | 13/13 — **100.0%** | **0** | [`case_07` agent trajectory](./docs/eval-evidence/trajectories/agent/case_07_payment_mismatch_adversarial.md): the deterministic verification downgrades the underpaid order to `flag_for_review` |
 
 **Model nondeterminism**: expect your numbers to differ somewhat. Observed across
-development runs: the agent landed at 10/13 → 11/13 before the final prompt hardening
-and **13/13 on the four runs that followed it**; the baseline's `case_07` failure has
-appeared both as a false confirm (`confirm_order`/`matched`) and as a wrong
+development runs: the agent landed at 10/13 → 11/13 before the final prompt hardening,
+**13/13 on the four runs that followed it**, and 12/13 on a fresh-clone verification run
+(the known flaky case is `case_05`, where the model occasionally refuses to extract an
+order it believes might be out of stock); the baseline's `case_07` failure has appeared
+both as a false confirm (`confirm_order`/`matched`) and as a wrong
 `await_payment`. What should hold in every run: **agent false-confirm count = 0** —
 that property is enforced by the deterministic verification stage (unit-tested in
-`worker/test/unit/verification.test.ts`), not by the model — and the agent
-outscoring the baseline by a wide margin. Transient upstream JSON errors are retried
-×3 by the harness (mirroring the workflow's production retry behavior), so a run
-should not abort; if one still fails, re-run before investigating.
+`worker/test/unit/verification.test.ts`) — and the agent outscoring the baseline by a
+wide margin. Transient upstream JSON errors are retried ×3 by the harness (mirroring
+the workflow's production retry behavior), so a run should not abort; if one still
+fails, re-run before investigating.
 
 ## API documentation & simulation (Scalar)
 

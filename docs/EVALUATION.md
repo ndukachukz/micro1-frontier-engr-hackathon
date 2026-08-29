@@ -30,8 +30,10 @@ Committed run **`EVAL-65111d52`** — full numbers and every trajectory in the
 | agent | 13/13 — 100.0% | 0 | `case_07` downgraded to `flag_for_review` + `payment_amount_mismatch` by the deterministic verification stage |
 
 Model nondeterminism (documented in the README "Expected results"): the agent scored
-10/13 → 11/13 before the final extraction-prompt hardening and 13/13 on the four runs
-after it; the baseline's `case_07` failure has shown up as either a false confirm or a
+10/13 → 11/13 before the final extraction-prompt hardening, 13/13 on the four runs
+after it, and 12/13 on a fresh-clone verification run (known flaky case: `case_05`,
+where the model occasionally refuses to extract an order it believes might be out of
+stock); the baseline's `case_07` failure has shown up as either a false confirm or a
 wrong `await_payment`. The agent's zero-false-confirm property held in **every**
 observed run — it is enforced by code, not by the model.
 
