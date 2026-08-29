@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chata-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "OPENCODE_MODEL": "minimax-m3",
+    "OPENCODE_VISION_MODEL": "deepseek-v4-flash-vision-exp"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chata",
+      "database_id": "chata-local"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "order-workflow",
+      "binding": "ORDER_WORKFLOW",
+      "class_name": "OrderWorkflow"
+    }
+  ],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["OrderWorkflow"]
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

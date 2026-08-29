@@ -1,0 +1,27 @@
+{
+  "name": "worker",
+  "type": "module",
+  "scripts": {
+    "generate-fixtures": "bun scripts/generate-fixtures.ts",
+    "dev": "bun scripts/generate-fixtures.ts && wrangler dev",
+    "deploy": "bun scripts/generate-fixtures.ts && wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "typecheck": "tsc --noEmit",
+    "test": "bun scripts/generate-fixtures.ts && vitest run",
+    "migrate": "wrangler d1 migrations apply chata --local",
+    "seed": "bun scripts/seed.ts && wrangler d1 execute chata --local --file=.seed/seed.sql"
+  },
+  "dependencies": {
+    "@chata/shared": "workspace:*",
+    "@hono/zod-openapi": "^1.6.1",
+    "@scalar/hono-api-reference": "^0.12.0",
+    "hono": "^4.13.5",
+    "zod": "^4.5.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.9.0",
+    "@cloudflare/workers-types": "^5.20260828.1",
+    "vitest": "^3.2.4",
+    "wrangler": "4.127.1"
+  }
+}

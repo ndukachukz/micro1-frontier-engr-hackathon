@@ -1,0 +1,25 @@
+{
+  "name": "chata",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "worker",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun --cwd worker dev",
+    "dev:web": "bun --cwd frontend dev",
+    "build": "bun --cwd frontend build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "bun --cwd packages/shared typecheck && bun --cwd worker typecheck && bun --cwd frontend typecheck",
+    "test": "bun --cwd worker test",
+    "seed": "bun --cwd worker seed",
+    "migrate": "bun --cwd worker migrate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0"
+  }
+}
