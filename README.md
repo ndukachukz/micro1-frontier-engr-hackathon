@@ -7,7 +7,8 @@ approval — with every decision auditable and benchmarked against a baseline.
 
 > Problem framing, scoring-rubric mapping, and the improvement changelog live in
 > [`PROJECT_PLAN.md`](./PROJECT_PLAN.md). Architecture details live in
-> [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md).
+> [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md). The solution-video script and
+> rehearsed demo path live in [`docs/video/STORYBOARD.md`](./docs/video/STORYBOARD.md).
 
 ## What existed before vs. what's new
 
