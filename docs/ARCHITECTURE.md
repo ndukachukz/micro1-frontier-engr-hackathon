@@ -53,7 +53,7 @@ routes ──▶ services ──▶ core
 | `persist-order-decision` | tool (D1) | order status/action/flags |
 | `send-reply` | tool (mocked) | outbound WhatsApp reply (recorded in conversation history) |
 | action branches | Workflows | approval wait / payment wait / terminal states |
-| `save-trajectory` | tool (D1) | full step-by-step trajectory for audit + eval |
+| `save-trajectory` | tool (D1) | full step-by-step trajectory for audit + eval (including one record per stock/payment tool call made during verification) |
 
 ### Why verification is code, not the LLM
 
@@ -112,6 +112,8 @@ against in-memory fixture tools), so runs are deterministic and repeatable.
   text (pre-extracted text — cached vision output or a fixture stand-in — wins, keeping evals
   deterministic). Live OCR is exercised by replaying an image webhook without `screenshot_ocr_text`.
 - The eval harness calls the agent core directly (fast iteration); the workflow is the
-  production-shaped path exercised by integration tests and the live demo.
+  production-shaped path, exercised by the live demo (webhook replay → order →
+  payment/approval) rather than by automated tests — the integration suite covers the
+  HTTP surface (health, OpenAPI/Scalar, catalog/payment reads, validation errors).
 - Workflow trajectories are saved before the long waits, so post-approval state changes
   live in the `orders`/`approvals` tables rather than the trajectory log.

@@ -34,7 +34,9 @@ hackathon.
 
 ## Quickstart
 
-Prerequisites: [Bun](https://bun.sh), Node 20+, a Cloudflare account for deploy (local dev works without).
+## Quickstart
+
+Prerequisites: [Bun](https://bun.sh) **1.2+** (pinned to `1.2.22` in `.bun-version`) and Node **20+** (`engines` in `package.json`). A Cloudflare account is only needed for deploy (local dev works without).
 
 ```bash
 bun install
@@ -68,7 +70,8 @@ curl -X POST http://localhost:8787/eval/fixtures/case_07_payment_mismatch_advers
 ```
 
 - **Expected output**: JSON `EvalRunSummary` — per-agent `accuracy`, `false_confirm_count`,
-  per-category breakdown, and per-case diffs. Metrics persist in D1 (`GET /eval/runs`).
+  per-category breakdown, and per-case diffs. Metrics persist in D1 (`GET /eval/runs`);
+  `bun --cwd worker export:eval` renders the latest run into `docs/eval-evidence/`.
 - **Model**: `minimax-m3` served through **OpenCode Go** (`https://opencode.ai/zen/go/v1/messages`,
   plain fetch — no SDK). Override with the `OPENCODE_MODEL` var in `worker/wrangler.jsonc`; the
   vision/OCR model defaults to `deepseek-v4-flash-vision-exp` (`OPENCODE_VISION_MODEL`).
@@ -85,6 +88,28 @@ curl -X POST http://localhost:8787/eval/fixtures/case_07_payment_mismatch_advers
   plus one followable trajectory per agent per case under `docs/eval-evidence/trajectories/`
   (agent instructions → every tool call and response → decision → reply). The vendor
   console's **Evaluation** page shows the run metrics.
+
+### Expected results (committed reference run)
+
+Committed run **`EVAL-65111d52`** — full evidence in
+[`docs/eval-evidence/summary.md`](./docs/eval-evidence/summary.md), every trajectory
+under `docs/eval-evidence/trajectories/<agent>/<case>.md`:
+
+| Agent | Accuracy | False confirms | What to look at |
+|---|---|---|---|
+| baseline | 2/13 — **15.4%** | **1** | [`case_07` baseline trajectory](./docs/eval-evidence/trajectories/baseline/case_07_payment_mismatch_adversarial.md): `confirm_order`/`matched` on a ₦10,000 transfer against a ₦16,000 order |
+| agent | 13/13 — **100.0%** | **0** | [`case_07` agent trajectory](./docs/eval-evidence/trajectories/agent/case_07_payment_mismatch_adversarial.md): the deterministic verification downgrades the underpaid order to `flag_for_review` |
+
+**Model nondeterminism**: expect your numbers to differ somewhat. Observed across
+development runs: the agent landed at 10/13 → 11/13 before the final prompt hardening
+and **13/13 on the four runs that followed it**; the baseline's `case_07` failure has
+appeared both as a false confirm (`confirm_order`/`matched`) and as a wrong
+`await_payment`. What should hold in every run: **agent false-confirm count = 0** —
+that property is enforced by the deterministic verification stage (unit-tested in
+`worker/test/unit/verification.test.ts`), not by the model — and the agent
+outscoring the baseline by a wide margin. Transient upstream JSON errors are retried
+×3 by the harness (mirroring the workflow's production retry behavior), so a run
+should not abort; if one still fails, re-run before investigating.
 
 ## API documentation & simulation (Scalar)
 
@@ -109,5 +134,5 @@ bun run typecheck   # tsc across shared + worker + frontend
 ## Synthetic data only
 
 All names, phone numbers, and payment references in `fixtures.json` are fabricated
-(`wa_id` values are prefixed `2348000000` to make this obvious). Nothing in this repo
+(`wa_id` values are prefixed `234800000` to make this obvious). Nothing in this repo
 touches a real store, bank, or WhatsApp account.

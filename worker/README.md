@@ -16,7 +16,7 @@ src/
 ├── lib/                      # result, errors, money, fixture loading
 └── types.ts                  # AppBindings (mirrors wrangler.jsonc)
 migrations/                   # D1 schema
-scripts/                      # seed + fixture codegen
+scripts/                      # seed + fixture codegen + eval evidence export
 test/                         # unit (core) + integration (real wrangler dev via unstable_dev)
 ```
 
@@ -31,6 +31,7 @@ bun test       # unit + integration tests
 bun typecheck  # tsc --noEmit
 bun migrate    # apply D1 migrations locally
 bun seed       # reset catalog + payments from ../fixtures.json
+bun export:eval  # render the latest eval run into ../docs/eval-evidence/ (summary + trajectories)
 bun deploy     # wrangler deploy
 ```
 
