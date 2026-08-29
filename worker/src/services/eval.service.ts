@@ -13,10 +13,18 @@ import { runOrderAgent } from '../core/agent/order-agent'
 import { runBaselineAgent } from '../core/baseline/baseline-agent'
 import { createFixtureTools } from '../core/eval/fixture-tools'
 import { scoreCase } from '../core/eval/score'
-import type { LlmClient, OcrClient } from '../core/tools/tool.types'
+import type { LlmClient, OcrClient, PipelineError } from '../core/tools/tool.types'
 import { badRequest, notFound, upstreamError } from '../lib/errors'
 import { loadFixtures } from '../lib/fixtures'
+import { runWithRetries } from '../lib/retry'
 import type { EvalRunRepository, TrajectoryRepository } from './ports'
+
+/**
+ * Mirrors the production workflow's extraction/OCR retry limit — the eval must
+ * measure the same pipeline behavior users get (transient LLM parse errors are
+ * retried, not surfaced).
+ */
+const PIPELINE_RETRY_ATTEMPTS = 3
 
 type ScoredCase = EvalCaseResult & {
   agent: EvalAgentName
@@ -98,22 +106,23 @@ export class EvalService {
     fixtureCase: FixtureCase,
   ): Promise<ScoredCase> {
     const customer = { waId: fixtureCase.customer.wa_id, name: fixtureCase.customer.name }
-    let output: AgentOutput
-    let trajectory: Trajectory
-    let reply: string | null = null
 
-    if (agent === 'baseline') {
-      const result = await runBaselineAgent(llm, ocr, {
-        trajectoryId: `${fixtureCase.id}-baseline`,
-        customer,
-        message: fixtureCase.message,
-      })
-      if (!result.ok) {
-        throw upstreamError(`Baseline failed on ${fixtureCase.id}: ${result.error.message}`)
+    const runPipeline = async (): Promise<{
+      output: AgentOutput
+      trajectory: Trajectory
+      reply: string | null
+    }> => {
+      if (agent === 'baseline') {
+        const result = await runBaselineAgent(llm, ocr, {
+          trajectoryId: `${fixtureCase.id}-baseline`,
+          customer,
+          message: fixtureCase.message,
+        })
+        if (!result.ok) {
+          throw result.error
+        }
+        return { output: result.value.output, trajectory: result.value.trajectory, reply: null }
       }
-      output = result.value.output
-      trajectory = { ...result.value.trajectory, case_id: fixtureCase.id }
-    } else {
       const fixtures = loadFixtures()
       const tools = createFixtureTools(fixtures)
       const result = await runOrderAgent(
@@ -129,12 +138,26 @@ export class EvalService {
         },
       )
       if (!result.ok) {
-        throw upstreamError(`Agent failed on ${fixtureCase.id}: ${result.error.message}`)
+        throw result.error
       }
-      output = result.value.output
-      reply = result.value.reply
-      trajectory = { ...result.value.trajectory, case_id: fixtureCase.id }
+      return {
+        output: result.value.output,
+        trajectory: result.value.trajectory,
+        reply: result.value.reply,
+      }
     }
+
+    const {
+      output,
+      trajectory: pipelineTrajectory,
+      reply,
+    } = await runWithRetries(runPipeline, PIPELINE_RETRY_ATTEMPTS).catch((error: PipelineError) => {
+      throw upstreamError(
+        `${agent === 'baseline' ? 'Baseline' : 'Agent'} failed on ${fixtureCase.id}: ${error.message}`,
+      )
+    })
+
+    const trajectory: Trajectory = { ...pipelineTrajectory, case_id: fixtureCase.id }
 
     const score = scoreCase(fixtureCase.expected_output, output)
     await this.deps.trajectories.save(trajectory)

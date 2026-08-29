@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "bun scripts/generate-fixtures.ts && vitest run",
     "migrate": "wrangler d1 migrations apply chata --local",
-    "seed": "bun scripts/seed.ts && wrangler d1 execute chata --local --file=.seed/seed.sql"
+    "seed": "bun scripts/seed.ts && wrangler d1 execute chata --local --file=.seed/seed.sql",
+    "export:eval": "bun scripts/export-eval.ts"
   },
   "dependencies": {
     "@chata/shared": "workspace:*",

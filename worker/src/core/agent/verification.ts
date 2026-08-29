@@ -7,12 +7,21 @@ import type { ExtractionResult } from './extraction'
 import type { PaymentEvidence } from './payment-evidence'
 import { parsePaymentEvidence } from './payment-evidence'
 
+export interface ToolCallRecord {
+  tool: 'StockTool' | 'PaymentTool'
+  operation: 'stock-lookup' | 'payment-lookup'
+  input: Record<string, unknown>
+  output: Record<string, unknown>
+}
+
 export interface VerificationInput {
   extraction: ExtractionResult
   message: InboundMessage
   catalog: readonly CatalogItem[]
   stock: StockTool
   payments: PaymentTool
+  /** Optional audit hook: every tool call made during verification (for trajectories). */
+  recordToolCall?: (call: ToolCallRecord) => void
 }
 
 /**
@@ -57,6 +66,7 @@ export async function runVerification(
   }
 
   const flags = new Set<string>(sanitizeFlags(extraction.flags))
+  const record = input.recordToolCall
 
   // Stock check via the stock tool, then recompute the total authoritatively from
   // catalog prices (the LLM's arithmetic is never trusted).
@@ -68,6 +78,20 @@ export async function runVerification(
       return { ok: false, error: { message: found.error.message, retryable: true } }
     }
     const catalogItem = found.value
+    record?.({
+      tool: 'StockTool',
+      operation: 'stock-lookup',
+      input: { sku: item.sku, quantity: item.quantity },
+      output: catalogItem
+        ? {
+            found: true,
+            sku: catalogItem.sku,
+            price_ngn: catalogItem.price_ngn,
+            stock: catalogItem.stock,
+            available: catalogItem.stock >= item.quantity,
+          }
+        : { found: false, sku: item.sku, available: false },
+    })
     if (!catalogItem || catalogItem.stock < item.quantity) {
       outOfStock = true
       flags.add('item_out_of_stock')
@@ -91,6 +115,19 @@ export async function runVerification(
     if (!payment.ok) {
       return { ok: false, error: { message: payment.error.message, retryable: true } }
     }
+    record?.({
+      tool: 'PaymentTool',
+      operation: 'payment-lookup',
+      input: { sender_ref: evidence.senderRef },
+      output: payment.value
+        ? {
+            found: true,
+            id: payment.value.id,
+            amount_ngn: payment.value.amount_ngn,
+            sender_ref: payment.value.sender_ref,
+          }
+        : { found: false, sender_ref: evidence.senderRef },
+    })
     if (!payment.value) {
       flags.add('payment_reference_not_found')
       action = 'flag_for_review'

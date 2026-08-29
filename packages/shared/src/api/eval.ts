@@ -7,11 +7,11 @@ export const EvalAgentNameSchema = z.enum(['baseline', 'agent'])
 export type EvalAgentName = z.infer<typeof EvalAgentNameSchema>
 
 export const EvalDiffSchema = z.object({
-  action: z.boolean(),
-  order: z.boolean(),
-  payment_status: z.boolean(),
-  matched_payment_id: z.boolean(),
-  flags: z.boolean(),
+  action: z.boolean().describe('true = differs from the expected output'),
+  order: z.boolean().describe('true = differs from the expected output'),
+  payment_status: z.boolean().describe('true = differs from the expected output'),
+  matched_payment_id: z.boolean().describe('true = differs from the expected output'),
+  flags: z.boolean().describe('true = differs from the expected output'),
 })
 
 export const EvalCaseResultSchema = z.object({
@@ -24,6 +24,9 @@ export const EvalCaseResultSchema = z.object({
   expected: AgentOutputSchema,
   actual: AgentOutputSchema,
   diff: EvalDiffSchema,
+  // Present on persisted runs and in-memory results; optional so API consumers can ignore it.
+  reply: z.string().nullable().optional().describe('Customer reply the agent produced'),
+  trajectory: TrajectorySchema.optional().describe('Full step-by-step run trajectory'),
 })
 
 export const EvalMetricsSchema = z.object({

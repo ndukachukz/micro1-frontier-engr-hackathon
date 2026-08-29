@@ -100,7 +100,9 @@ export class OrderWorkflow extends WorkflowEntrypoint<AppBindings, OrderWorkflow
       },
     )
 
-    // 4. Verification (deterministic — the anti-false-confirm guard)
+    // 4. Verification (deterministic — the anti-false-confirm guard). Tool calls
+    // inside the stage are recorded so the trajectory is a complete audit log.
+    const verificationToolCalls: import('../../core/agent/verification').ToolCallRecord[] = []
     const output: AgentOutput = await step.do('verify-and-decide', async () => {
       const result = await runVerification({
         extraction,
@@ -108,6 +110,7 @@ export class OrderWorkflow extends WorkflowEntrypoint<AppBindings, OrderWorkflow
         catalog,
         stock: tools.stock,
         payments: tools.payments,
+        recordToolCall: (call) => verificationToolCalls.push(call),
       })
       if (!result.ok) {
         throw new Error(result.error.message)
@@ -163,6 +166,16 @@ export class OrderWorkflow extends WorkflowEntrypoint<AppBindings, OrderWorkflow
           started_at: event.timestamp.toISOString(),
           duration_ms: 0,
         },
+        ...verificationToolCalls.map(
+          (call): TrajectoryStep => ({
+            step: `verify:${call.operation}`,
+            tool: call.tool,
+            input: call.input,
+            output: call.output,
+            started_at: event.timestamp.toISOString(),
+            duration_ms: 0,
+          }),
+        ),
         {
           step: 'verify-and-decide',
           tool: 'StockTool+PaymentTool',

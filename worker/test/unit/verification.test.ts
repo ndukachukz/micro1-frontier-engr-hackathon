@@ -171,6 +171,57 @@ describe('runVerification (deterministic decision stage)', () => {
     expect(result.value.order?.reconstructed_from_history).toBe(true)
   })
 
+  it('records every stock and payment tool call it makes', async () => {
+    const calls: Array<{ tool: string; operation: string; input: unknown; output: unknown }> = []
+    const result = await runVerification({
+      extraction: orderFor([
+        ['EGGS_CRATE', 2],
+        ['TOMATOES_BASKET', 1],
+      ]),
+      message: ocrMessage(
+        'Bank Transfer Successful\nAmount: NGN 10,000.00\nTo: Chata Stores\nRef: ZEN-114820\n27 Aug 2026, 11:42',
+      ),
+      catalog,
+      ...tools(),
+      recordToolCall: (call) => calls.push(call),
+    })
+
+    expect(result.ok).toBe(true)
+    expect(calls).toHaveLength(3)
+    expect(calls[0]).toMatchObject({
+      tool: 'StockTool',
+      operation: 'stock-lookup',
+      input: { sku: 'EGGS_CRATE', quantity: 2 },
+      output: { found: true, sku: 'EGGS_CRATE', price_ngn: 3500, available: true },
+    })
+    expect(calls[1]).toMatchObject({
+      tool: 'StockTool',
+      operation: 'stock-lookup',
+      input: { sku: 'TOMATOES_BASKET', quantity: 1 },
+      output: { found: true, available: true },
+    })
+    expect(calls[2]).toMatchObject({
+      tool: 'PaymentTool',
+      operation: 'payment-lookup',
+      input: { sender_ref: 'ZEN-114820' },
+      output: { found: true, id: 'PMT002', amount_ngn: 10000 },
+    })
+  })
+
+  it('records an unknown payment reference as not found', async () => {
+    const calls: Array<{ tool: string; operation: string; input: unknown; output: unknown }> = []
+    await runVerification({
+      extraction: orderFor([['RICE_BAG', 1]]),
+      message: ocrMessage('Transfer done\nAmount: NGN 45,000.00\nRef: XYZ-999999'),
+      catalog,
+      ...tools(),
+      recordToolCall: (call) => calls.push(call),
+    })
+
+    const paymentCall = calls.find((call) => call.operation === 'payment-lookup')
+    expect(paymentCall?.output).toMatchObject({ found: false, sender_ref: 'XYZ-999999' })
+  })
+
   it('overrides an LLM arithmetic error with the catalog-computed total', async () => {
     const badMath = orderFor([
       ['RICE_BAG', 2],

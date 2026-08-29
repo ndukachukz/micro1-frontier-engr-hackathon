@@ -79,7 +79,12 @@ curl -X POST http://localhost:8787/eval/fixtures/case_07_payment_mismatch_advers
   without pre-extracted `screenshot_ocr_text` — fixture cases stay deterministic
   (`case_13_screenshot_image_url` documents the path; replay a webhook with the OCR text
   removed to exercise the live vision call).
-- Every run writes trajectories to D1 (`trajectories` table) and the UI surfaces them under **Evaluation**.
+- Every run writes trajectories to D1 (`trajectories` table), and
+  `bun --cwd worker export:eval` renders the latest run into a committed,
+  human-readable evidence bundle: [`docs/eval-evidence/summary.md`](./docs/eval-evidence/summary.md)
+  plus one followable trajectory per agent per case under `docs/eval-evidence/trajectories/`
+  (agent instructions → every tool call and response → decision → reply). The vendor
+  console's **Evaluation** page shows the run metrics.
 
 ## API documentation & simulation (Scalar)
 

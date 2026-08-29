@@ -104,7 +104,9 @@ export async function runOrderAgent(
     duration_ms: Date.now() - extractStarted,
   })
 
-  // Stage 2: verification (deterministic tools + code).
+  // Stage 2: verification (deterministic tools + code). Every tool call made
+  // inside the stage is recorded as its own trajectory step so the audit log
+  // shows exactly what the code consulted and what came back.
   const verifyStart = new Date().toISOString()
   const verifyStarted = Date.now()
   const verified = await runVerification({
@@ -113,6 +115,16 @@ export async function runOrderAgent(
     catalog: input.catalog,
     stock: deps.stock,
     payments: deps.payments,
+    recordToolCall: (call) => {
+      steps.push({
+        step: `verify:${call.operation}`,
+        tool: call.tool,
+        input: call.input,
+        output: call.output,
+        started_at: new Date().toISOString(),
+        duration_ms: 0,
+      })
+    },
   })
   if (!verified.ok) {
     steps.push({

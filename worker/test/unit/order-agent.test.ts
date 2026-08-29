@@ -66,11 +66,20 @@ describe('runOrderAgent', () => {
     expect(result.value.output.order?.total_ngn).toBe(20000)
     expect(result.value.reply).toContain('Payment confirmed')
 
+    // Every tool call inside the deterministic stage is recorded as its own
+    // step, so the trajectory is a complete audit log of what code consulted.
     expect(result.value.trajectory.steps.map((step) => step.step)).toEqual([
       'extract-order',
+      'verify:stock-lookup',
+      'verify:stock-lookup',
+      'verify:payment-lookup',
       'verify-and-decide',
       'send-reply',
     ])
+    const paymentLookup = result.value.trajectory.steps.find(
+      (step) => step.step === 'verify:payment-lookup',
+    )
+    expect(paymentLookup?.output).toMatchObject({ found: true, id: 'PMT001', amount_ngn: 20000 })
   })
 
   it('produces an await_payment decision and reply when no payment evidence exists', async () => {
