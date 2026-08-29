@@ -22,12 +22,6 @@
       "class_name": "OrderWorkflow"
     }
   ],
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["OrderWorkflow"]
-    }
-  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
