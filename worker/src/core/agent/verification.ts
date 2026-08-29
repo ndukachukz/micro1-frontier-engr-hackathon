@@ -1,4 +1,4 @@
-import type { AgentOutput, CatalogItem, InboundMessage } from '@chata/shared'
+import type { AgentOutput, CatalogItem, InboundMessage, TrajectoryStep } from '@chata/shared'
 
 import { KNOWN_ORDER_FLAGS } from '@chata/shared'
 import type { Result } from '../../lib/result'
@@ -12,6 +12,18 @@ export interface ToolCallRecord {
   operation: 'stock-lookup' | 'payment-lookup'
   input: Record<string, unknown>
   output: Record<string, unknown>
+}
+
+/** Shapes a recorded tool call into the trajectory step format shared by the agent pipeline and the workflow. */
+export function toolCallStep(call: ToolCallRecord, startedAt: string): TrajectoryStep {
+  return {
+    step: `verify:${call.operation}`,
+    tool: call.tool,
+    input: call.input,
+    output: call.output,
+    started_at: startedAt,
+    duration_ms: 0,
+  }
 }
 
 export interface VerificationInput {

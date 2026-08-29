@@ -18,7 +18,7 @@ import type {
 import { type ExtractionResult, runExtraction } from './extraction'
 import { runOcr } from './ocr'
 import { buildReplyText } from './reply-templates'
-import { runVerification } from './verification'
+import { runVerification, toolCallStep } from './verification'
 
 export interface OrderAgentDeps {
   llm: LlmClient
@@ -116,14 +116,7 @@ export async function runOrderAgent(
     stock: deps.stock,
     payments: deps.payments,
     recordToolCall: (call) => {
-      steps.push({
-        step: `verify:${call.operation}`,
-        tool: call.tool,
-        input: call.input,
-        output: call.output,
-        started_at: new Date().toISOString(),
-        duration_ms: 0,
-      })
+      steps.push(toolCallStep(call, new Date().toISOString()))
     },
   })
   if (!verified.ok) {

@@ -12,20 +12,17 @@ export async function runWithRetries<T>(
   options: { backoffMs?: number } = {},
 ): Promise<T> {
   const backoffMs = options.backoffMs ?? 1000
-  let lastError: PipelineError | undefined
-  for (let attempt = 1; attempt <= attempts; attempt++) {
+  for (let attempt = 1; ; attempt++) {
     try {
       return await fn()
     } catch (error) {
-      const pipelineError = error as PipelineError
-      lastError = pipelineError
-      if (!pipelineError?.retryable || attempt === attempts) {
-        throw pipelineError
+      const retryable = (error as PipelineError | undefined)?.retryable === true
+      if (!retryable || attempt >= attempts) {
+        throw error
       }
       await sleep(backoffMs * attempt)
     }
   }
-  throw lastError
 }
 
 function sleep(ms: number): Promise<void> {

@@ -11,7 +11,7 @@ import { formatItems, formatNgn } from '@chata/shared'
 import { runExtraction } from '../../core/agent/extraction'
 import { runOcr } from '../../core/agent/ocr'
 import { buildReplyText } from '../../core/agent/reply-templates'
-import { runVerification } from '../../core/agent/verification'
+import { runVerification, toolCallStep } from '../../core/agent/verification'
 import type { OrderWorkflowParams } from '../../services/ports'
 import type { AppBindings } from '../../types'
 import {
@@ -166,16 +166,7 @@ export class OrderWorkflow extends WorkflowEntrypoint<AppBindings, OrderWorkflow
           started_at: event.timestamp.toISOString(),
           duration_ms: 0,
         },
-        ...verificationToolCalls.map(
-          (call): TrajectoryStep => ({
-            step: `verify:${call.operation}`,
-            tool: call.tool,
-            input: call.input,
-            output: call.output,
-            started_at: event.timestamp.toISOString(),
-            duration_ms: 0,
-          }),
-        ),
+        ...verificationToolCalls.map((call) => toolCallStep(call, event.timestamp.toISOString())),
         {
           step: 'verify-and-decide',
           tool: 'StockTool+PaymentTool',

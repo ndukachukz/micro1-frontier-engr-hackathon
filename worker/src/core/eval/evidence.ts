@@ -101,14 +101,9 @@ export function renderSummaryMarkdown(
     const diffFields = Object.entries(result.diff)
       .filter(([, differs]) => differs)
       .map(([field]) => field)
-    const outcome = result.false_confirm
-      ? '**FAIL — FALSE CONFIRM**'
-      : result.passed
-        ? 'pass'
-        : '**FAIL**'
     const verdict = result.passed
       ? 'pass'
-      : `${outcome}${diffFields.length > 0 ? ` (differed: ${diffFields.join(', ')})` : ''}`
+      : `${caseVerdict(result)}${diffFields.length > 0 ? ` (differed: ${diffFields.join(', ')})` : ''}`
     return `| ${result.case_id} | ${result.category} | ${verdict} |`
   })
 
@@ -348,9 +343,7 @@ function renderSideBySideCaseTable(
 
   const verdictFor = (agent: string, caseId: string): string => {
     const result = (perCase.get(agent) ?? []).find((candidate) => candidate.case_id === caseId)
-    if (!result) return '—'
-    if (result.false_confirm) return '**FAIL — FALSE CONFIRM**'
-    return result.passed ? 'pass' : '**FAIL**'
+    return result ? caseVerdict(result) : '—'
   }
 
   return caseIds
@@ -359,6 +352,11 @@ function renderSideBySideCaseTable(
       return `| ${caseId} | ${categories.get(caseId) ?? ''} | ${cells.join(' | ')} |`
     })
     .join('\n')
+}
+
+function caseVerdict(result: { passed: boolean; false_confirm: boolean }): string {
+  if (result.false_confirm) return '**FAIL — FALSE CONFIRM**'
+  return result.passed ? 'pass' : '**FAIL**'
 }
 
 function collectCategories(summary: EvalRunSummary): string[] {

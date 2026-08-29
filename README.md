@@ -35,8 +35,6 @@ hackathon.
 
 ## Quickstart
 
-## Quickstart
-
 Prerequisites: [Bun](https://bun.sh) **1.2+** (pinned to `1.2.22` in `.bun-version`) and Node **20+** (`engines` in `package.json`). A Cloudflare account is only needed for deploy (local dev works without).
 
 ```bash
