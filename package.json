@@ -20,7 +20,10 @@
     "typecheck": "bun --cwd packages/shared typecheck && bun --cwd worker typecheck && bun --cwd frontend typecheck",
     "test": "bun --cwd worker test",
     "seed": "bun --cwd worker seed",
-    "migrate": "bun --cwd worker migrate"
+    "migrate": "bun --cwd worker migrate",
+    "deploy:worker": "bun --cwd worker deploy",
+    "deploy:web": "bun --cwd frontend deploy",
+    "deploy:all": "bun run deploy:worker && bun run deploy:web"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0"

@@ -131,6 +131,28 @@ bun run lint        # Biome
 bun run typecheck   # tsc across shared + worker + frontend
 ```
 
+## Deployment
+
+Deploys the API to Cloudflare Workers and the vendor console to Cloudflare Pages
+(direct upload from `frontend/dist`, configured in `frontend/wrangler.jsonc`):
+
+```bash
+# One-time setup: creates the Pages project (wrangler login first, or set CLOUDFLARE_API_TOKEN)
+bun --cwd frontend wrangler pages project create chata --production-branch main
+
+bun run deploy:all     # worker + frontend in one go
+bun run deploy:worker  # API only  (generates fixtures, then `wrangler deploy --minify`)
+bun run deploy:web     # UI only   (`vite build`, then `wrangler pages deploy`)
+```
+
+- Worker → `https://chata-worker.<your-subdomain>.workers.dev`; Pages → `https://chata.pages.dev`
+  (preview deploys get their own URLs per branch/commit).
+- Deploys made from a non-`main` git branch go to a Pages preview URL; `main` goes to
+  production. The API base URL the console calls is baked at build time from
+  `frontend/.env.production` (`VITE_API_URL`) — update it if the worker URL changes.
+- CI usage: pass `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` and run the same
+  `deploy:web` / `deploy:worker` scripts non-interactively.
+
 ## Synthetic data only
 
 All names, phone numbers, and payment references in `fixtures.json` are fabricated

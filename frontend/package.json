@@ -10,7 +10,9 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "predeploy": "bun run build",
+    "deploy": "wrangler pages deploy dist --project-name=chata-frontend --branch=main --commit-dirty=true"
   },
   "dependencies": {
     "@chata/shared": "workspace:*",
@@ -32,7 +34,8 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
     "typescript": "^6.0.2",
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "wrangler": "4.127.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
