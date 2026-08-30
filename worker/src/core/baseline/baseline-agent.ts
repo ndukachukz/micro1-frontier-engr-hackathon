@@ -13,8 +13,8 @@ export interface BaselineInput {
 }
 
 /**
- * The baseline (PROJECT_PLAN §5): a single LLM call, one prompt, no tools,
- * no verification, no memory. Every later iteration is measured against this.
+ * The baseline: a single LLM call, one prompt, no tools, no verification, no
+ * memory. Every later iteration is measured against this.
  */
 export async function runBaselineAgent(
   llm: LlmClient,

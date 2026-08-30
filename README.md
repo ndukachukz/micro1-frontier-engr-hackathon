@@ -5,10 +5,10 @@ WhatsApp messages from small-store customers, extracts structured orders, verifi
 against stock and bank-payment records, and only releases stock after an explicit human
 approval — with every decision auditable and benchmarked against a baseline.
 
-> Problem framing, scoring-rubric mapping, and the improvement changelog live in
-> [`PROJECT_PLAN.md`](./PROJECT_PLAN.md). Architecture details live in
-> [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md). The solution-video script and
-> rehearsed demo path live in [`docs/video/STORYBOARD.md`](./docs/video/STORYBOARD.md).
+> Architecture details live in [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md);
+> evaluation methodology and the committed evidence bundle live in
+> [`docs/EVALUATION.md`](./docs/EVALUATION.md) and
+> [`docs/eval-evidence/`](./docs/eval-evidence/summary.md).
 
 ## What existed before vs. what's new
 
@@ -25,7 +25,6 @@ hackathon.
 ## Repository layout
 
 ```
-├── PROJECT_PLAN.md           # problem framing, changelog, rubric mapping
 ├── fixtures.json             # synthetic fixtures (catalog, payments, 13 test cases) — single source of truth
 ├── docs/                     # architecture, ADRs, evaluation
 ├── packages/shared/          # zod domain + API contracts used by worker AND frontend

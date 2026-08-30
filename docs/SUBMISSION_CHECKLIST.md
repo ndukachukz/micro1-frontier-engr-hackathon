@@ -20,19 +20,21 @@ accepted rather than fixed. Nothing new gets built here.
 ## Deliverables
 
 - [x] **Deliverable 1 — solution code + labeled Improvement Changelog**:
-      `PROJECT_PLAN.md` §6 tells the iteration story (baseline →
-      extraction+memory → verification-as-code → prompt hardening → eval-retry
-      fix → final), each row linked to committed artifacts; the main failure
-      mode (false confirm on case_07) and hot take (§10) are present.
+      the iteration story (baseline → extraction+memory → verification-as-code →
+      prompt hardening → eval-retry fix → final) is evidenced by committed
+      artifacts — `docs/adr/`, the eval bundle (`docs/eval-evidence/`), and the
+      README comparison table; the main failure mode (false confirm on case_07)
+      is documented in `docs/eval-evidence/summary.md`.
 - [x] **Deliverable 2 — reproduction guide**: README covers setup, exact
       commands (solution/baseline/eval/export), data required, expected output
       (committed reference run + honest nondeterminism note), versions
       (`engines` node ≥20, `.bun-version` 1.2.22, model `minimax-m3` via
       OpenCode Go), approximate runtime (~1 min/run, ~26 LLM calls) and cost
       (OpenCode Go subscription).
-- [ ] **Deliverable 3 — video**: storyboard + rehearsed demo script committed
-      (`docs/video/STORYBOARD.md`); the ≤5:00 recording itself is pending the
-      human narration/approval step by design (agent-assisted ticket).
+- [ ] **Deliverable 3 — video**: demo path rehearsed end-to-end against the
+      committed code; recording script kept in the author's planning notes (out
+      of the repo by intent); the ≤5:00 recording itself is pending the human
+      narration/approval step.
 - [x] **Deliverable 4 — representative trajectories**: committed under
       `docs/eval-evidence/trajectories/` — one per agent per fixture case (26
       files), each followable top-to-bottom (instructions → every tool call and
@@ -64,9 +66,9 @@ accepted rather than fixed. Nothing new gets built here.
       gitignored; `.dev.vars.example` carries a placeholder; tracked content
       swept for key values (`sk-`, `OPENCODE_API_KEY=<value>`): only the
       example/placeholder text matches.
-- [x] **Every result claim tied to a committed artifact** — README and
-      PROJECT_PLAN claims link to `docs/eval-evidence/` (summary + trajectories)
-      or unit tests (`worker/test/unit/verification.test.ts`).
+- [x] **Every result claim tied to a committed artifact** — README claims link
+      to `docs/eval-evidence/` (summary + trajectories) or unit tests
+      (`worker/test/unit/verification.test.ts`).
 - [x] **Judges can run the project** — clean-room clone verified end-to-end
       (quickstart + eval + export), guided by the README alone.
 
