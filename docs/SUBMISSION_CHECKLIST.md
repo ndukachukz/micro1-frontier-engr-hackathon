@@ -49,7 +49,7 @@ accepted rather than fixed. Nothing new gets built here.
 | Reproducibility (15) | **strong** | No `latest` deps, `engines` + `.bun-version` committed, expected-output block with accepted variance, fresh-clone verification actually performed and recorded. |
 | Solution quality / agent architecture | **strong** | LLM-proposes/code-verifies split with the downgrade guaranteed by code and tests; durable workflow with human-approval gate; audit trajectories include per-tool-call records; hexagonal layering kept honest (core is infra-free). |
 | Hot take (5) | **strong** | Grown from an observed failure (baseline's confident false confirm), with a practical consequence (proposals vs decisions) and a roadmap implication. |
-| Video (5) | **pending human** | Script + rehearsed path committed; recording/narration/approval is the deliberate human step of the agent-assisted ticket. Anything short of "recorded and ≤5:00" is not scoreable yet — fix before submitting. |
+| Video (5) | **pending human** | Demo path rehearsed against the committed code; recording/narration/approval is the deliberate human step before submitting. Anything short of "recorded and ≤5:00" is not scoreable yet — fix before submitting. |
 
 ## Ground rules
 
@@ -78,4 +78,4 @@ accepted rather than fixed. Nothing new gets built here.
   once, `case_05` flakiness) instead of 13/13 — accepted and documented in the
   README with the invariant that actually matters (0 false confirms) called out.
 - The video deliverable remains open until the human records it — accepted as
-  the designed split of the agent-assisted ticket, not as a gap to fix here.
+  the deliberate human step, not as a gap to fix here.
