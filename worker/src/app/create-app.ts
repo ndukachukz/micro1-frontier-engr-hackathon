@@ -1,5 +1,6 @@
 import { ProblemSchema } from '@chata/shared'
 import { OpenAPIHono } from '@hono/zod-openapi'
+import { cors } from 'hono/cors'
 import { registerCatalogRoutes } from '../routes/catalog.routes'
 import { registerEvalRoutes } from '../routes/eval.routes'
 import { registerHealthRoutes } from '../routes/health.routes'
@@ -30,6 +31,7 @@ export function createApp(env: AppEnv['Bindings']): OpenAPIHono<AppEnv> {
     },
   })
 
+  app.use('*', cors())
   app.onError(errorHandler)
   app.notFound((c) => c.json({ status: 404, title: 'Not Found' }, 404))
 

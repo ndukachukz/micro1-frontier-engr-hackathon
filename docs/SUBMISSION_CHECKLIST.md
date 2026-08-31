@@ -44,7 +44,7 @@ accepted rather than fixed. Nothing new gets built here.
 
 | Criterion | Self-score | Why |
 |---|---|---|
-| Problem & User Value (15) | **strong** | Concrete Lagos vendor profile (§1) anchored to the fixture catalog/payments; the unconfirmed-payment cost is specific and drives the design. |
+| Problem & User Value (15) | **strong** | The migration trap: a social-first Lagos vendor keeps selling in DMs while Chata's backend becomes the system of record — problem and persona stated in the README and `docs/ARCHITECTURE.md` ("The problem & the user"), anchored to the fixture catalog/payments; the unconfirmed-payment cost is the money-safety pillar driving the verification design. |
 | Measured Improvement (15) | **strong** | Baseline 2/13 (15.4%, 1 false confirm) vs agent 13/13 (100%, 0) on the committed run; changelog rows each carry evidence; the false-confirm elimination is unit-pinned, not anecdotal. |
 | Reproducibility (15) | **strong** | No `latest` deps, `engines` + `.bun-version` committed, expected-output block with accepted variance, fresh-clone verification actually performed and recorded. |
 | Solution quality / agent architecture | **strong** | LLM-proposes/code-verifies split with the downgrade guaranteed by code and tests; durable workflow with human-approval gate; audit trajectories include per-tool-call records; hexagonal layering kept honest (core is infra-free). |

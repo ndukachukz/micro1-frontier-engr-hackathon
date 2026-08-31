@@ -304,7 +304,7 @@ function renderReply(reply: string | null): string[] {
 }
 
 function jsonBlock(value: unknown): string {
-  return '```json\n' + JSON.stringify(value, null, 2) + '\n```'
+  return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``
 }
 
 function pct(value: number): string {

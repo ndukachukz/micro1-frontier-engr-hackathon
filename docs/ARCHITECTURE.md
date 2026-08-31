@@ -1,5 +1,18 @@
 # Chata — Architecture
 
+## The problem & the user
+
+The user is a Lagos small-store vendor whose storefront is a WhatsApp number. Orders
+arrive as DMs — text with typos and Pidgin, payment screenshots. She wants what a
+backend gives a web store: real order records, customer history, analytics, and the
+ability to hand a customer to a teammate. But her customers will not migrate to a
+website; the DMs *are* the store. Chata's bet: don't migrate the customers — migrate
+the data. Every inbound message becomes a structured order in the backend (the 13
+fixture cases model exactly this traffic: happy paths, noisy input, ambiguous
+requests, memory, order modifications, adversarial payment mismatches); payments are
+verified against bank records by deterministic code; and stock only moves after her
+explicit approval in the vendor console.
+
 ## System overview
 
 ```

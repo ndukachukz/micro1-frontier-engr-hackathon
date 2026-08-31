@@ -1,9 +1,28 @@
-# Chata — Agentic Order Intake & Payment Confirmation
+# Chata — keep selling in WhatsApp DMs, with a real backend behind it
 
-Hackathon submission for the **micro1 Agentic Workflows Hackathon**. Chata reads inbound
-WhatsApp messages from small-store customers, extracts structured orders, verifies them
-against stock and bank-payment records, and only releases stock after an explicit human
-approval — with every decision auditable and benchmarked against a baseline.
+Hackathon submission for the **micro1 Agentic Workflows Hackathon**.
+
+## The problem: the migration trap
+
+A social-first store decides to get serious: it builds a website and a backend for
+real order records, customer history, and analytics. Then nothing changes — because
+customers don't come. They keep DMing. The business ends up running two systems: a
+backend with almost nothing in it, and a WhatsApp inbox that is the actual storefront
+but produces no data. Staff copy-paste every order from chat into the backend —
+double entry — or orders live only in the thread: no record, no analytics, no way to
+hand a customer to a teammate, payment proofs buried in screenshots.
+
+Chata's answer: don't migrate the customers — migrate the data. Keep selling where
+customers already are. Chata reads each inbound WhatsApp message, structures it
+against the catalog into a validated order, writes it to the backend as a first-class
+record, and answers the customer automatically — every order event (confirmed /
+flagged / awaiting payment) gets an auditable reply. The vendor works from a console,
+not from a chat thread.
+
+Money stays safe in the same motion: Chata verifies every payment against bank
+records and releases stock only after the vendor's explicit approval. A false confirm
+— stock released against an underpayment — is made structurally impossible by the
+verification stage, not merely discouraged by the model.
 
 > Architecture details live in [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md);
 > evaluation methodology and the committed evidence bundle live in
@@ -12,12 +31,12 @@ approval — with every decision auditable and benchmarked against a baseline.
 
 ## What existed before vs. what's new
 
-| | Status |
-|---|---|
-| React + TanStack Router frontend | **New** — scaffolded for this submission (TanStack Query added) |
-| TypeScript + Hono on Cloudflare Workers backend | **New** — scaffolded for this submission |
-| Agent pipeline (parsing, tool use, verification, memory) | **New** |
-| Baseline + eval harness + fixtures + trajectories | **New** |
+|                                                          | Status                                                          |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
+| React + TanStack Router frontend                         | **New** — scaffolded for this submission (TanStack Query added) |
+| TypeScript + Hono on Cloudflare Workers backend          | **New** — scaffolded for this submission                        |
+| Agent pipeline (parsing, tool use, verification, memory) | **New**                                                         |
+| Baseline + eval harness + fixtures + trajectories        | **New**                                                         |
 
 There was no pre-existing code: both apps were created inside this repository for the
 hackathon.
@@ -93,10 +112,10 @@ Committed run **`EVAL-65111d52`** — full evidence in
 [`docs/eval-evidence/summary.md`](./docs/eval-evidence/summary.md), every trajectory
 under `docs/eval-evidence/trajectories/<agent>/<case>.md`:
 
-| Agent | Accuracy | False confirms | What to look at |
-|---|---|---|---|
-| baseline | 2/13 — **15.4%** | **1** | [`case_07` baseline trajectory](./docs/eval-evidence/trajectories/baseline/case_07_payment_mismatch_adversarial.md): `confirm_order`/`matched` on a ₦10,000 transfer against a ₦16,000 order |
-| agent | 13/13 — **100.0%** | **0** | [`case_07` agent trajectory](./docs/eval-evidence/trajectories/agent/case_07_payment_mismatch_adversarial.md): the deterministic verification downgrades the underpaid order to `flag_for_review` |
+| Agent    | Accuracy           | False confirms | What to look at                                                                                                                                                                                   |
+| -------- | ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| baseline | 2/13 — **15.4%**   | **1**          | [`case_07` baseline trajectory](./docs/eval-evidence/trajectories/baseline/case_07_payment_mismatch_adversarial.md): `confirm_order`/`matched` on a ₦10,000 transfer against a ₦16,000 order      |
+| agent    | 13/13 — **100.0%** | **0**          | [`case_07` agent trajectory](./docs/eval-evidence/trajectories/agent/case_07_payment_mismatch_adversarial.md): the deterministic verification downgrades the underpaid order to `flag_for_review` |
 
 **Model nondeterminism**: expect your numbers to differ somewhat. Observed across
 development runs: the agent landed at 10/13 → 11/13 before the final prompt hardening,
@@ -126,7 +145,7 @@ requests (`packages/shared`) and serves an interactive Scalar reference at
 ## Testing
 
 ```bash
-bun test            # worker: unit (core pipeline, no infra) + integration (routes, D1, workflows via wrangler dev)
+bun run test        # worker: unit + integration (vitest; integration boots wrangler dev)
 bun run lint        # Biome
 bun run typecheck   # tsc across shared + worker + frontend
 ```
@@ -140,7 +159,7 @@ Deploys the API to Cloudflare Workers and the vendor console to Cloudflare Pages
 # One-time setup: creates the Pages project (wrangler login first, or set CLOUDFLARE_API_TOKEN)
 bun --cwd frontend wrangler pages project create chata --production-branch main
 
-bun run deploy:all     # worker + frontend in one go
+bun run deploy     # worker + frontend in one go
 bun run deploy:worker  # API only  (generates fixtures, then `wrangler deploy --minify`)
 bun run deploy:web     # UI only   (`vite build`, then `wrangler pages deploy`)
 ```

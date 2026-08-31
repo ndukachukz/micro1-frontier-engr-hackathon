@@ -23,7 +23,7 @@
     "migrate": "bun --cwd worker migrate",
     "deploy:worker": "bun --cwd worker deploy",
     "deploy:web": "bun --cwd frontend deploy",
-    "deploy:all": "bun run deploy:worker && bun run deploy:web"
+    "deploy": "bun run deploy:worker && bun run deploy:web"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0"

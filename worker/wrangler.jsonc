@@ -6,24 +6,24 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "OPENCODE_MODEL": "minimax-m3",
-    "OPENCODE_VISION_MODEL": "deepseek-v4-flash-vision-exp",
+    "OPENCODE_VISION_MODEL": "deepseek-v4-flash-vision-exp"
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "chata_db",
-      "database_id": "cc6ea5b4-1133-4eb8-ac6f-ec193f25770f",
-    },
+      "database_id": "cc6ea5b4-1133-4eb8-ac6f-ec193f25770f"
+    }
   ],
   "workflows": [
     {
       "name": "order-workflow",
       "binding": "ORDER_WORKFLOW",
-      "class_name": "OrderWorkflow",
-    },
+      "class_name": "OrderWorkflow"
+    }
   ],
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1,
-  },
+    "head_sampling_rate": 1
+  }
 }

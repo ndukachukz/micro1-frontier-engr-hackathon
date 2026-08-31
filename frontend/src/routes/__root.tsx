@@ -1,12 +1,12 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
-import "../styles.css";
+import '../styles.css'
 
 export const Route = createRootRoute({
   component: RootComponent,
-});
+})
 
 function RootComponent() {
   return (
@@ -19,10 +19,7 @@ function RootComponent() {
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
             Orders
           </Link>
-          <Link
-            to="/eval"
-            className="text-sm text-slate-600 hover:text-slate-900"
-          >
+          <Link to="/eval" className="text-sm text-slate-600 hover:text-slate-900">
             Evaluation
           </Link>
           <a
@@ -38,15 +35,15 @@ function RootComponent() {
       <Outlet />
       <TanStackDevtools
         config={{
-          position: "bottom-right",
+          position: 'bottom-right',
         }}
         plugins={[
           {
-            name: "TanStack Router",
+            name: 'TanStack Router',
             render: <TanStackRouterDevtoolsPanel />,
           },
         ]}
       />
     </div>
-  );
+  )
 }

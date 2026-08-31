@@ -1,7 +1,9 @@
 # Evaluation
 
-Methodology and results for the Chata order-intake agent. Update after every run —
-don't reconstruct from memory.
+Methodology and results for the Chata agent. The primary metric scores whether messy
+WhatsApp DMs become correct structured backend records; the metric that matters most
+is the false-confirm rate — the money-safety pillar of the migration-trap story
+(see the README). Update after every run — don't reconstruct from memory.
 
 ## Method
 
